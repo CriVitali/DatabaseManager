@@ -97,6 +97,21 @@ public class SampleController {
 	@FXML
 	public void DeleteButton(ActionEvent event) throws SQLException {
 		
+		ConnectionClass connectionClass=new ConnectionClass();
+        Connection connection=connectionClass.getConnection();
+
+        // prendere valori da campi testo
+        String id = idDelete.getText();
+
+        System.out.println("id passato" + id);
+        String sql = "DELETE FROM amici WHERE id =" + id;
+        System.out.println(sql);
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
+        connection.close();
+        avvisoText.setText("Elemento cancellato con successo! ["+ id +"]");
+		
+		
 	}
 	// Event Listener on Button.onAction
 	@FXML
