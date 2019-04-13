@@ -5,11 +5,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import application.model.Amico;
 import javafx.event.ActionEvent;
 
 import javafx.scene.control.Label;
@@ -109,13 +112,40 @@ public class SampleController {
         Statement statement = connection.createStatement();
         statement.execute(sql);
         connection.close();
-        avvisoText.setText("Elemento cancellato con successo! ["+ id +"]");
-		
+        avvisoText.setText("Elemento cancellato con successo! ["+ id +"]");		
 		
 	}
+	
+	public static ArrayList<Amico> elencoAmici() throws SQLException {
+		
+		ArrayList<Amico> elenco = new ArrayList<Amico>();
+		
+		ConnectionClass connectionClass=new ConnectionClass();
+        Connection connection=connectionClass.getConnection();
+
+		String sql = "SELECT id, nome, cognome, dataNascita FROM amici;";
+		// query
+		
+		Statement statement = connection.createStatement();
+		ResultSet rs = statement.executeQuery(sql);		
+		while (rs.next() == true) {
+			
+			Amico a = new Amico(rs.getInt("id"), rs.getString("nome"), rs.getString("cognome"),
+								rs.getDate("dataNascita"));
+			elenco.add(a);
+			
+		}
+
+		connection.close(); // chiusura connessione
+		return elenco;
+	}
+	
 	// Event Listener on Button.onAction
 	@FXML
-	public void VisualizzaButton(ActionEvent event) {
+	public void VisualizzaButton(ActionEvent event) throws SQLException {
 		
+		System.out.println( elencoAmici().toString() );
+		avvisoText.setText( elencoAmici().toString() );	
+		 
 	}
 }
