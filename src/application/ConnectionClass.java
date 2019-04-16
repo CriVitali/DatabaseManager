@@ -4,27 +4,26 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class ConnectionClass {
-	
-    public Connection connection;
-    public  Connection getConnection(){
 
+	public Connection connection;
 
-        String dbName="test";
-        String userName="root";
-        String password="";
+	public Connection getConnection() {
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+		String dbName = "test";
+		String userName = "root";
+		String password = "";
 
-        connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/"+dbName+"?user="+userName+"&"+"password="+password);
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
+			connection = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/" + dbName + "?user=" + userName + "&" + "password=" + password);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-
-        return connection;
-    }
+		return connection;
+	}
 
 }
