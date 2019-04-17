@@ -16,38 +16,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.DatePicker;
 
 public class SampleController {
-	@FXML
-	private Label avvisoText;
+
 	@FXML
 	private TextField idInsert;
 	@FXML
-	private TextField cognomeDelete;
-	@FXML
-	private TextField cognomeUpdate;
-	@FXML
 	private TextField cognomeInsert;
-	@FXML
-	private TextField nomeDelete;
-	@FXML
-	private TextField nomeUpdate;
 	@FXML
 	private TextField nomeInsert;
 	@FXML
-	private TextField idDelete;
-	@FXML
-	private TextField idUpdate;
-	@FXML
 	private DatePicker dataInsert;
-	@FXML
-	private DatePicker dataDelete;
-	@FXML
-	private DatePicker dataUpdate;
 	@FXML
 	private TableView<Amico> personData;
 	@FXML
@@ -65,7 +47,10 @@ public class SampleController {
 
 	@FXML
 	private void initialize() {
+
 		dc = new ConnectionClass();
+		aggiornaDatabase();
+
 	}
 
 	// Event Listener on Button.onAction
@@ -88,7 +73,7 @@ public class SampleController {
 		Statement st = cn.createStatement();
 		st.execute(sql);
 		cn.close();
-		avvisoText.setText("Elemento inserito con successo! [" + id + "," + nome + "," + cognome + "," + sqlData + "]");
+		aggiornaDatabase();
 
 		// azzera i campi
 		idInsert.setText("");
@@ -106,10 +91,10 @@ public class SampleController {
 		Connection cn = connectionClass.getConnection();
 
 		// prendere valori da campi testo
-		String id = idUpdate.getText();
-		String nome = nomeUpdate.getText();
-		String cognome = cognomeUpdate.getText();
-		LocalDate ld = dataUpdate.getValue();
+		String id = idInsert.getText();
+		String nome = nomeInsert.getText();
+		String cognome = cognomeInsert.getText();
+		LocalDate ld = dataInsert.getValue();
 
 		String sqlData = ld.toString();
 		String sql = "UPDATE amici SET nome = '" + nome + "', cognome = '" + cognome + "', dataNascita='" + sqlData
@@ -118,8 +103,7 @@ public class SampleController {
 		Statement st = cn.createStatement();
 		st.execute(sql);
 		cn.close();
-		avvisoText
-				.setText("Elemento modificato con successo! [" + id + "," + nome + "," + cognome + "," + sqlData + "]");
+		aggiornaDatabase();
 
 		// azzera i campi
 		idInsert.setText("");
@@ -136,13 +120,13 @@ public class SampleController {
 		Connection cn = connectionClass.getConnection();
 
 		// prendere valori da campi testo
-		String id = idDelete.getText();
+		String id = idInsert.getText();
 		String sql = "DELETE FROM amici WHERE id =" + id;
 
 		Statement st = cn.createStatement();
 		st.execute(sql);
 		cn.close();
-		avvisoText.setText("Elemento cancellato con successo! [" + id + "]");
+		aggiornaDatabase();
 
 		// azzera i campi
 		idInsert.setText("");
@@ -151,20 +135,24 @@ public class SampleController {
 		dataInsert.setValue(null);
 	}
 
-	// Event Listener on Button.onAction
-	@FXML
-	public void VisualizzaButton(ActionEvent event) throws SQLException {
+	public void aggiornaDatabase() {
 
 		Connection cn = dc.getConnection();
 		amiciObserv = FXCollections.observableArrayList();
 
 		String sql = "SELECT * FROM amici;";
-		ResultSet rs = cn.createStatement().executeQuery(sql);
+		ResultSet rs;
+		try {
+			rs = cn.createStatement().executeQuery(sql);
 
-		while (rs.next()) {
+			while (rs.next()) {
 
-			amiciObserv.add(new Amico(rs.getInt("id"), rs.getString("nome"), rs.getString("cognome"),
-					rs.getDate("dataNascita").toLocalDate()));
+				amiciObserv.add(new Amico(rs.getInt("id"), rs.getString("nome"), rs.getString("cognome"),
+						rs.getDate("dataNascita").toLocalDate()));
+			}
+		} catch (SQLException e) {
+
+			e.printStackTrace();
 		}
 
 		// set cell value factory to tableview
@@ -174,5 +162,6 @@ public class SampleController {
 		colonnaData.setCellValueFactory(new PropertyValueFactory<>("data"));
 
 		personData.setItems(amiciObserv);
+
 	}
 }
